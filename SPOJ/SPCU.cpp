@@ -7,19 +7,16 @@ using namespace std;
 int main() {
   int total;
   scanf("%d", &total);
-  
   while (total--) {
     ll n;
     bool wrong = false;
     scanf("%lli", &n);
     ll *heights;
     heights = (ll*) malloc(n * sizeof(ll));
-    
     for (ll i = 0; i < n; i++) {
       scanf("%lli", &heights[i]);
       if (heights[i] > i) wrong = true;
     }
-    
     if (wrong) {
       printf("NO\n");
     } else {
@@ -27,4 +24,4 @@ int main() {
     }
   }
   return 0;
-} 
+}

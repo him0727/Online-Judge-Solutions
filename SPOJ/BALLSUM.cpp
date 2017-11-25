@@ -1,5 +1,4 @@
 #include <bits/stdc++.h>
- 
 #define ll long long int
  
 using namespace std;
@@ -13,19 +12,16 @@ int main() {
     ll n, k;
     scanf("%lli %lli", &n, &k);
     if (n == -1 && k == -1) break;
-    
-    ll a = n * (n - 1) / 2;
-    ll b = k & 1 ? k / 2 : k / 2 - 1;
-    ll c = b * k - b * (b + 1);
-    ll total = a, prob = c;
-    
-    if (prob == 0) {
+    ll total = n * (n - 1) / 2;
+    ll a = k & 1 ? k / 2 : k / 2 - 1;
+    ll times = a * k - a * (a + 1);
+    if (times == 0) {
       printf("0\n");
-    } else if (prob == total) {
+    } else if (times == total) {
       printf("1\n");
     } else {
-      ll gcm = find_gcm(prob, total);
-      printf("%lli/%lli\n", prob / gcm, total / gcm);
+      ll gcm = find_gcm(times, total);
+      printf("%lli/%lli\n", times / gcm, total / gcm);
     }
   }
   return 0;
