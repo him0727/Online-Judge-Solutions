@@ -9,7 +9,7 @@ int compare(const void* a, const void* b) {
 int main(void) {
   ll n;
   scanf("%lli", &n);
-  for (ll current = 0; current < n; current++) {
+  while (n--) {
     char blank[1];
     gets(blank);
     ll m;
