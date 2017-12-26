@@ -3,8 +3,8 @@
  
 using namespace std;
  
-ll find_gcm(ll a, ll b) {
-  return b == 0 ? a : find_gcm(b, a % b);  
+ll find_gcd(ll a, ll b) {
+  return b == 0 ? a : find_gcd(b, a % b);  
 }
  
 int main() {
@@ -20,8 +20,8 @@ int main() {
     } else if (times == total) {
       printf("1\n");
     } else {
-      ll gcm = find_gcm(times, total);
-      printf("%lli/%lli\n", times / gcm, total / gcm);
+      ll gcd = find_gcd(times, total);
+      printf("%lli/%lli\n", times / gcd, total / gcd);
     }
   }
   return 0;
