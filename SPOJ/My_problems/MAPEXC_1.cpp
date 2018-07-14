@@ -9,7 +9,7 @@ int dy[4] = {0, 0, 1, -1};
 char graph[MAX][MAX];
 int cost[MAX][MAX];
 int n, m;
-
+ 
 void bfs(int sx, int sy) {
   queue<pair<int, int>> q;
   q.push({sx, sy});
@@ -20,20 +20,21 @@ void bfs(int sx, int sy) {
     q.pop();
     for (int i = 0; i < 4; i++) {
       int nx = cur_x + dx[i], ny = cur_y + dy[i];
-      if (nx >= 0 && nx < n && ny >= 0 && ny < m) {
-        if (graph[cur_x][cur_y] == '.' && graph[nx][ny] == '.' && (cost[nx][ny] == -1 || cost[nx][ny] > cost[cur_x][cur_y])) {
-          cost[nx][ny] = cost[cur_x][cur_y];
-          q.push({nx, ny});
-        }
-        if ((graph[cur_x][cur_y] != '.' || graph[nx][ny] != '.') && (cost[nx][ny] == -1 || cost[nx][ny] > cost[cur_x][cur_y] + 1)) {
-          cost[nx][ny] = cost[cur_x][cur_y] + 1;
-          q.push({nx, ny});
-        }
+      if (nx < 0 || nx >= n || ny < 0 || ny >= m) {
+      	continue;
+      }
+      if (graph[cur_x][cur_y] == '.' && graph[nx][ny] == '.' && (cost[nx][ny] == -1 || cost[nx][ny] > cost[cur_x][cur_y])) {
+        cost[nx][ny] = cost[cur_x][cur_y];
+        q.push({nx, ny});
+      }
+      if ((graph[cur_x][cur_y] != '.' || graph[nx][ny] != '.') && (cost[nx][ny] == -1 || cost[nx][ny] > cost[cur_x][cur_y] + 1)) {
+        cost[nx][ny] = cost[cur_x][cur_y] + 1;
+        q.push({nx, ny});
       }
     }
   }
 }
-
+ 
 int main() {
   int tt;
   scanf("%d", &tt);
