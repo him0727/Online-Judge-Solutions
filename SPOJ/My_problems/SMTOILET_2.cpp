@@ -1,66 +1,50 @@
 #include <bits/stdc++.h>
-typedef unsigned long long ull;
  
 using namespace std;
  
 int toilets[510];
- 
-ull calc(ull v, int n) {
-  ull tmp = 0LL;
-  for (int i = 0; i < n; i++) {
-    if (i + 1 > v) {
-      break;
-    }
-    tmp += v * toilets[i];
-    tmp -= i * toilets[i];
-  }
-  return tmp;
-}
- 
-ull to_pow10(ull v) {
-  if (v <= 1) {
-    return 1;
-  }
-  if (v <= 10) {
-    return 10;
-  }
-  ull base = 10LL;
-  for (ull i = 1; i < ceil(log10(v)); i++) {
-    base *= 10;
-  }
-  return base;
-}
-
-ull uabs(ull v1, ull v2) {
-  return v1 > v2 ? v1 - v2 : v2 - v1;
-}
  
 int main() {
   int tt;
   scanf("%d", &tt);
   while (tt--) {
     int n;
-    ull m;
+    long long m, ans, pfx = 0, ppfx = 0;
+    bool ok = false;
     string s;
-    scanf("%d %llu", &n, &m);
+    scanf("%d %lld", &n, &m);
     cin >> s;
     for (int i = 0; i < n; i++) {
       scanf("%d", &toilets[i]);
-    }
-    ull low = 1, high = m / toilets[0];
-    while (low < high) {
-      ull mid = low + ((high - low) >> 1);
-      if (calc(mid, n) >= m) {
-        high = mid;
-      } else {
-        low = mid + 1;
+      pfx += toilets[i];
+      ppfx += pfx;
+      if (!ok && ppfx >= m) {
+        ans = i + 1;
+        ok = true;
       }
     }
-    if (uabs(calc(high, n), m) > uabs(calc(high - 1, n), m)) {
-      high -= 1;
+    if (!ok) {
+      ans = n + (m - ppfx) / pfx + 1;  
+    }
+    auto calc = [&](long long v) {
+      long long tmp = 0LL;
+      for (int i = 0; i < n; i++) {
+        if (i + 1 > v) {
+          break;
+        }
+        tmp += toilets[i] * (v - i);
+      }
+      return tmp;
+    };
+    if (calc(ans) - m > m - calc(ans - 1)) {
+      ans--;
     }
     int sz = (int) s.size();
-    int door = floor(high * 1.0 / to_pow10(high) * (sz - 1));
+    long long pow_10 = ans <= 1 ? 1 : 10;
+    for (int i = 1; i < ceil(log10(ans)); i++) {
+      pow_10 *= 10;
+    }
+    int door = floor(ans * 1.0 / pow_10 * (sz - 1));
     int left_sc = 0, tmp_lsc = 0, lsi;
     int right_sc = 0, tmp_rsc = 0, rsi;
     for (int i = 0, j = sz - 1; i <= door || j >= door; i++, j--) {
@@ -93,7 +77,7 @@ int main() {
     } else {
       si = left_sc > right_sc ? lsi : rsi;
     }
-    printf("%llu %d\n", high, si);
+    printf("%lld %d\n", ans, si);
   }
   return 0;
 }
