@@ -30,7 +30,6 @@ struct point {
   }
 };
 
-
 bool done;
 int total_dist, tile_dist, n_tile;
 int dest[110], cache[21][110];
