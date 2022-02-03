@@ -3,52 +3,42 @@
 using namespace std;
 
 int main() {
-  const int inf = 10010;
   int tt;
-  scanf("%d", &tt);
+  cin >> tt;
   while (tt--) {
     string s;
     cin >> s;
-    vector<int> sl, tp;
-    vector<vector<int>> sp;
-    int len = 0;
-    for (auto c : s) {
-      len++;
-      if (c == '*') {
-        sl.push_back(len);
-        len = 1;
-        sp.push_back(tp);
-        tp.clear();
+    int n = (int) s.size();
+    vector<int> tlps, gems;
+    for (int i = 0; i < n; i++) {
+      if (s[i] == '*') {
+        gems.push_back(i);
       }
-      if (c == '@') {
-        tp.push_back(len - 1);
+      if (s[i] == '@') {
+        tlps.push_back(i);
       }
     }
-    int ans = 0;
-    for (int cs = 0; cs < sl.size(); cs++) {
-      int slen = sl[cs];
-      int plen = sp[cs].size();
-      if (plen == 0) {
-        ans += slen - 1;
-        continue;
+    int last_gem = gems.back();
+    int tlp_idx = 0, gem_idx = 0;
+    vector<int> f(last_gem + 1, 10010);
+    f[0] = 0;
+    for (int i = 0; i <= last_gem; i++) {
+      if (i > 0) {
+        f[i] = min(f[i], f[i - 1] + 1);
       }
-      vector<int> f(slen, inf);
-      f[sp[cs][0]] = sp[cs][0];
-      int cp = 0;
-      while (cp < plen) {
-        int p = sp[cs][cp];
-        int np = cp < plen - 1 ? sp[cs][cp + 1] : slen;
-        np--;
-        f[np] = f[p] + np - p;
-        for (int i = 1; i <= 3 && cp + i < plen; i++) {
-          np = sp[cs][cp + i];
-          f[np] = min(f[np], min(f[p] + 3, f[np - 1] + 1));
+      if (s[i] == '*') {
+        gem_idx++;
+      }
+      if (s[i] == '@') {
+        int move = 1;
+        while (move <= 3 && tlp_idx + move < (int) tlps.size() && tlps[tlp_idx + move] < gems[gem_idx]) {
+          f[tlps[tlp_idx + move]] = min(f[tlps[tlp_idx + move]], f[i] + 3);
+          move++;
         }
-        cp++;
+        tlp_idx++;
       }
-      ans += f[slen - 1];
     }
-    printf("%d\n", ans);
+    cout << f[last_gem] << '\n';
   }
   return 0;
 }

@@ -2,13 +2,7 @@
 
 using namespace std;
 
-const int MAX = 110;
-
-int itr, mid;
-int from[MAX], dur[MAX], p[MAX], used[MAX];
-vector<int> g[MAX];
-
-bool dfs(int u) {
+bool dfs(int u, int itr, int extra, vector<pair<int, int>>& tasks, vector<vector<int>>& g, vector<int>& p, vector<int>& used) {
   if (u == -1) {
     return true;
   }
@@ -17,7 +11,7 @@ bool dfs(int u) {
   }
   used[u] = itr;
   for (int v : g[u]) {
-    if (from[v] >= from[u] + dur[u] + mid && dfs(p[v])) {
+    if (tasks[v].first >= tasks[u].second + extra && dfs(p[v], itr, extra, tasks, g, p, used)) {
       p[v] = u;
       return true;
     }
@@ -27,61 +21,62 @@ bool dfs(int u) {
 
 int main() {
   int tt;
-  scanf("%d", &tt);
+  cin >> tt;
   while (tt--) {
-    int N;
-    scanf("%d", &N);
-    for (int i = 0; i < N; i++) {
-      scanf("%d", &from[i]);
-      dur[i] = 0;
+    int n;
+    cin >> n;
+    vector<pair<int, int>> tasks(n);
+    vector<vector<int>> g(n);
+    vector<int> p(n, -1), used(n, -1);
+    for (int i = 0; i < n; i++) {
+      cin >> tasks[i].first;
+      tasks[i].second = 0;
       for (int j = 0; j < 4; j++) {
-        int tmp;
-        scanf("%d", &tmp);
-        dur[i] = max(dur[i], tmp);
+        int dur;
+        cin >> dur;
+        tasks[i].second = max(tasks[i].second, dur);
       }
+      tasks[i].second += tasks[i].first;
     }
-    for (int i = 0; i < N; i++) {
-      g[i].clear();
-      used[i] = p[i] = -1;
-    }
-    for (int i = 0; i < N; i++) {
-      for (int j = 0; j < N; j++) {
-        if (i != j && from[j] >= from[i] + dur[i]) {
+    for (int i = 0; i < n; i++) {
+      for (int j = 0; j < n; j++) {
+        if (i != j && tasks[j].first >= tasks[i].second) {
           g[i].push_back(j);
         }
       }
     }
-    mid = itr = 0;
+    int itr = 0;
     int least = 0;
-    for (int i = 0; i < N; i++) {
+    for (int i = 0; i < n; i++) {
       itr++;
-      if (!dfs(i)) {
+      if (!dfs(i, itr, 0, tasks, g, p, used)) {
         least++;
       }
     }
-    int low = 0, high = 86400;
-    int ans;
+    int ans = 0;
+    int low = 0;
+    int high = 86400;
     while (low <= high) {
-      mid = (low + high) / 2;
-      for (int i = 0; i < N; i++) {
+      int mid = (low + high) / 2;
+      for (int i = 0; i < n; i++) {
         used[i] = p[i] = -1;
       }
       itr = 0;
       int need = 0;
-      for (int i = 0; i < N; i++) {
+      for (int i = 0; i < n; i++) {
         itr++;
-        if (!dfs(i)) {
+        if (!dfs(i, itr, mid, tasks, g, p, used)) {
           need++;
         }
       }
-      if (need > least) {
-        high = mid - 1;
-      } else {
-        low = mid + 1;
+      if (need <= least) {
         ans = mid;
+        low = mid + 1;
+      } else {
+        high = mid - 1;
       }
     }
-    printf("%d\n", ans);
+    cout << ans << '\n';
   }
   return 0;
 }

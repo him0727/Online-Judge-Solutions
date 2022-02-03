@@ -1,84 +1,73 @@
 #include <bits/stdc++.h>
-typedef unsigned long long ull;
  
 using namespace std;
- 
-int toilets[510];
- 
-ull calc(ull v, int n) {
-  ull tmp = 0LL;
-  for (int i = 0; i < n; i++) {
-    if (i + 1 > v) {
-      break;
-    }
-    tmp += toilets[i] * (v - i);
-  }
-  return tmp;
-}
- 
+
 int main() {
   int tt;
-  scanf("%d", &tt);
+  cin >> tt;
   while (tt--) {
     int n;
-    ull m;
-    string s;
-    scanf("%d %llu", &n, &m);
-    cin >> s;
+    long long m, ans = -1, sum = 0, accumlate = 0;
+    cin >> n >> m;
+    string cubicles;
+    cin >> cubicles;
+    vector<long long> odors(n);
     for (int i = 0; i < n; i++) {
-      scanf("%d", &toilets[i]);
-    }
-    ull low = 1, high = m / toilets[0];
-    while (low < high) {
-      ull mid = low + ((high - low) >> 1);
-      if (calc(mid, n) >= m) {
-        high = mid;
-      } else {
-        low = mid + 1;
+      cin >> odors[i];
+      sum += odors[i];
+      accumlate += sum;
+      if (ans == -1 && accumlate >= m) {
+        ans = i + 1;
       }
     }
-    if (calc(high, n) - m > m - calc(high - 1, n)) {
-      high--;
+    if (ans == -1) {
+      ans = n + ((m - accumlate) / sum ) + 1;
     }
-    int sz = (int) s.size();
-    long long pow_10 = high <= 1 ? 1 : 10;
-    for (int i = 1; i < ceil(log10(high)); i++) {
-      pow_10 *= 10;
-    }
-    int door = floor(high * 1.0 / pow_10 * (sz - 1));
-    int left_sc = 0, tmp_lsc = 0, lsi;
-    int right_sc = 0, tmp_rsc = 0, rsi;
-    for (int i = 0, j = sz - 1; i <= door || j >= door; i++, j--) {
-      if (i <= door) {
-        if (s[i] == 'x' || i == door) {
-          if (tmp_lsc >= left_sc) {
-            lsi = i - ceil(tmp_lsc / 2.0);
-            left_sc = tmp_lsc;
-          }
-          tmp_lsc = 0;
-        } else {
-          tmp_lsc++;
-        }
+    auto find_diff = [&](long long cur) {
+      long long res = 0;
+      for (int i = 0; i < n && i < cur; i++) {
+        res += odors[i] * (cur - i);
       }
-      if (j >= door) {
-        if (s[j] == 'x' || j == door) {
-          if (tmp_rsc >= right_sc) {
-            rsi = j + ceil(tmp_rsc / 2.0);
-            right_sc = tmp_rsc;
-          }
-          tmp_rsc = 0;
-        } else {
-          tmp_rsc++;
-        }
+      return res;
+    };
+    if (find_diff(ans) - m > m - find_diff(ans - 1)) {
+      ans--;
+    }
+    long long p = ans <= 1 ? 1 : 10;
+    for (int i = 1; i < ceil(log10(ans)); i++) {
+      p *= 10;
+    }
+    int len = (int) cubicles.size();
+    int door = floor(ans * 1.0 / p * (len - 1));
+    cubicles[door] = 'x';
+    int diff = -1, mid = -1, dist = -1;
+    int choice = -1;
+    for (int i = 0; i < len; i++) {
+      if (cubicles[i] == 'x') {
+        continue;
+      }
+      int l = i, r = i;
+      while (l >= 0 && cubicles[l] == 'o') {
+        l--;
+      }
+      while (r < len && cubicles[r] == 'o') {
+        r++;
+      }
+      int cur_diff = i - l + r - i;
+      int cur_mid = min(i - l, r - i);
+      int cur_dist = abs(i - door);
+      bool is_best = cur_diff > diff;
+      if (cur_diff == diff) {
+        is_best = cur_mid > mid || (cur_mid == mid && cur_dist <= dist);
+      }
+      if (is_best) {
+        diff = cur_diff;
+        mid = cur_mid;
+        dist = cur_dist;
+        choice = i;
       }
     }
-    int si;
-    if (left_sc == right_sc) {
-      si = rsi - door <= door - lsi ? rsi : lsi;
-    } else {
-      si = left_sc > right_sc ? lsi : rsi;
-    }
-    printf("%llu %d\n", high, si);
+    cout << ans << ' ' << choice << '\n';
   }
   return 0;
 }

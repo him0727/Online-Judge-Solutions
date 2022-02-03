@@ -4,20 +4,20 @@ using namespace std;
 
 int main() {
   int tt;
-  scanf("%d", &tt);
+  cin >> tt;
   while (tt--) {
-    int N, M;
-    scanf("%d %d", &N, &M);
-    vector<int> tasks(N);
-    for (int i = 0; i < N; i++) {
-      scanf("%d", &tasks[i]);
+    int n, m;
+    cin >> n >> m;
+    vector<int> tasks(n);
+    for (int i = 0; i < n; i++) {
+      cin >> tasks[i];
     }
     sort(tasks.begin(), tasks.end());
     int ans = 86400;
-    for (int i = 0; i + M < N; i++) {
-      ans = min(ans, tasks[i + M] - tasks[i]);
+    for (int i = 0; i + m < n; i++) {
+      ans = min(ans, tasks[i + m] - tasks[i]);
     }
-    printf("%d\n", ans);
+    cout << ans << '\n';
   }
   return 0;
 }

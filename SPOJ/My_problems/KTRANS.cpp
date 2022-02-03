@@ -2,56 +2,46 @@
  
 using namespace std;
  
-const int NN = 55;
-const int MM = 2500;
- 
-int dist[NN][NN], cur[NN][NN];
-int u[MM], v[MM], w[MM], l[MM];
- 
 int main() {
   int tt;
   cin >> tt;
   while (tt--) {
-    int N, M, K;
-    cin >> N >> M >> K;
-    for (int i = 0; i < M; i++) {
-      cin >> u[i] >> v[i] >> w[i] >> l[i];
-      u[i]--;
-      v[i]--;
+    int n, m, k;
+    cin >> n >> m >> k;
+    vector<int> U(m), V(m), W(m), L(m);
+    vector<vector<int>> dist(n, vector<int>(n, -1));
+    vector<vector<int>> cur(n, vector<int>(n));
+    for (int i = 0; i < m; i++) {
+      cin >> U[i] >> V[i] >> W[i] >> L[i];
+      U[i]--; V[i]--;
     }
-    for (int i = 0; i < N; i++) {
-      for (int j = 0; j < N; j++) {
-        dist[i][j] = (i == j ? 0 : -1);
-      }
+    for (int i = 0; i < n; i++) {
+      dist[i][i] = 0;
     }
-    while (K--) {
-      for (int i = 0; i < N; i++) {
-        for (int j = 0; j < N; j++) {
+    while (k--) {
+      for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++) {
           cur[i][j] = dist[i][j];
         }
       }
-      for (int edge = 0; edge < M; edge++) {
-        int uu = u[edge];
-        int vv = v[edge];
-        for (int node = 0; node < N; node++) {
-          if (dist[node][uu] == -1) {
+      for (int edge = 0; edge < m; edge++) {
+        int u = U[edge];
+        int v = V[edge];
+        for (int node = 0; node < n; node++) {
+          if (dist[node][u] == -1) {
             continue;
           }
-          if (dist[node][uu] <= l[edge]) {
-            if (cur[node][vv] == -1 || cur[node][vv] > dist[node][uu] + w[edge]) {
-              cur[node][vv] = dist[node][uu] + w[edge];
+          if (dist[node][u] <= L[edge]) {
+            if (cur[node][v] == -1 || cur[node][v] > dist[node][u] + W[edge]) {
+              cur[node][v] = dist[node][u] + W[edge];
             }
           }
         }
       }
-      for (int i = 0; i < N; i++) {
-        for (int j = 0; j < N; j++) {
-          dist[i][j] = cur[i][j];
-        }
-      }
+      swap(dist, cur);
     }
-    for (int i = 0; i < N; i++) {
-      for (int j = 0; j < N; j++) {
+    for (int i = 0; i < n; i++) {
+      for (int j = 0; j < n; j++) {
         if (j > 0) {
           cout << ' ';
         }

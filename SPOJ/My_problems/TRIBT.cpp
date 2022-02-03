@@ -1,52 +1,35 @@
 #include <bits/stdc++.h>
- 
+
 using namespace std;
- 
-const int MAX = 100010;
-int lt[MAX], rt[MAX];
-int lt_child[MAX], rt_child[MAX];
-int lt_parent[MAX], rt_parent[MAX];
-int ans;
- 
-void dfs(int root) {
-  if (lt[root] != -1) {
-    lt_parent[lt[root]] = lt_parent[root] + 1;
-    dfs(lt[root]);
-    lt_child[root] = lt_child[lt[root]] + 1;
-  }
-  if (rt[root] != -1) {
-    rt_parent[rt[root]] = rt_parent[root] + 1;
-    dfs(rt[root]);
-    rt_child[root] = rt_child[rt[root]] + 1;
-  }
-  ans += min(lt_child[root], rt_child[root]) + min(lt_parent[root], rt_child[root]) + min(rt_parent[root], lt_child[root]);
+
+pair<int, int> dfs(int root, int lp, int rp, vector<vector<int>>& child, int& ans) {
+  int lc = child[root][0] == -1 ? 0 : dfs(child[root][0], lp + 1, 0, child, ans).first;
+  int rc = child[root][1] == -1 ? 0 : dfs(child[root][1], 0, rp + 1, child, ans).second;
+  ans += min(lc, rc) + min(lc, rp) + min(rc, lp);
+  return {lc + 1, rc + 1};
 }
- 
+
 int main() {
   int tt;
-  scanf("%d", &tt);
+  cin >> tt;
   while (tt--) {
-    int n, p, root;
-    scanf("%d", &n);
-    fill(lt, lt + n, -1);
-    fill(rt, rt + n, -1);
+    int n, root;
+    cin >> n;
+    vector<vector<int>> child(n, vector<int>(2, -1));
     for (int i = 0; i < n; i++) {
-      lt_child[i] = rt_child[i] = 0;
-      lt_parent[i] = rt_parent[i] = 0;
-      scanf("%d", &p);
+      int p;
+      cin >> p;
       if (p == -1) {
         root = i;
-        continue;
-      }
-      if (lt[p] == -1) {
-        lt[p] = i;
+      } else if (child[p][0] == -1) {
+        child[p][0] = i;
       } else {
-        rt[p] = i;
+        child[p][1] = i;
       }
     }
-    ans = 0;
-    dfs(root);
-    printf("%d\n", ans);
+    int ans = 0;
+    dfs(root, 0, 0, child, ans);
+    cout << ans << '\n';
   }
   return 0;
 }

@@ -2,76 +2,72 @@
  
 using namespace std;
  
-const int MAX = 210;
- 
-int dx[4] = {1, -1, 0, 0};
-int dy[4] = {0, 0, 1, -1};
-char graph[MAX][MAX];
-int cost[MAX][MAX];
-int n, m;
- 
-void bfs(int sx, int sy) {
+vector<vector<int>> bfs(int sx, int sy, vector<string>& g) {
+  const vector<int> DX = {1, -1, 0, 0};
+  const vector<int> DY = {0, 0, 1, -1};
+  int n = (int) g.size();
+  int m = (int) g[0].size();
+  vector<vector<int>> cost(n, vector<int>(m, -1));
+  cost[sx][sy] = 0;
   queue<pair<int, int>> q;
   q.push({sx, sy});
-  cost[sx][sy] = 0;
   while (!q.empty()) {
-    pair<int, int> cur = q.front();
-    int cur_x = cur.first, cur_y = cur.second;
+    int x = q.front().first;
+    int y = q.front().second;
     q.pop();
-    for (int i = 0; i < 4; i++) {
-      int nx = cur_x + dx[i], ny = cur_y + dy[i];
-      if (nx < 0 || nx >= n || ny < 0 || ny >= m) {
-      	continue;
-      }
-      if (graph[cur_x][cur_y] == '.' && graph[nx][ny] == '.' && (cost[nx][ny] == -1 || cost[nx][ny] > cost[cur_x][cur_y])) {
-        cost[nx][ny] = cost[cur_x][cur_y];
-        q.push({nx, ny});
-      }
-      if ((graph[cur_x][cur_y] != '.' || graph[nx][ny] != '.') && (cost[nx][ny] == -1 || cost[nx][ny] > cost[cur_x][cur_y] + 1)) {
-        cost[nx][ny] = cost[cur_x][cur_y] + 1;
-        q.push({nx, ny});
+    for (int d = 0; d < 4; d++) {
+      int nx = x + DX[d];
+      int ny = y + DY[d];
+      if (nx >= 0 && nx < n && ny >= 0 && ny < m) {
+        if (g[x][y] == '.' && g[nx][ny] == '.') {
+          if (cost[nx][ny] == -1 || cost[nx][ny] > cost[x][y]) {
+            cost[nx][ny] = cost[x][y];
+            q.push({nx, ny});
+          }
+        }
+        if (g[x][y] != '.' || g[nx][ny] != '.') {
+          if (cost[nx][ny] == -1 || cost[nx][ny] > cost[x][y] + 1) {
+            cost[nx][ny] = cost[x][y] + 1;
+            q.push({nx, ny});
+          }
+        }
       }
     }
   }
+  return cost;
 }
- 
+
 int main() {
   int tt;
-  scanf("%d", &tt);
+  cin >> tt;
   while (tt--) {
-    int sx, sy, fx, fy, mcost;
-    scanf("%d %d %d", &n, &m, &mcost);
+    int n, m, c;
+    cin >> n >> m >> c;
+    vector<string> g(n);
+    int sx, sy, fx, fy;
     for (int i = 0; i < n; i++) {
+      cin >> g[i];
       for (int j = 0; j < m; j++) {
-        scanf(" %c", &graph[i][j]);
-        cost[i][j] = -1;
-        if (graph[i][j] == 'S') {
-          sx = i, sy = j;
+        if (g[i][j] == 'S') {
+          sx = i; sy = j;
         }
-        if (graph[i][j] == 'F') {
-          fx = i, fy = j;
+        if (g[i][j] == 'F') {
+          fx = i; fy = j;
         }
       }
     }
-    bfs(sx, sy);
-    if (cost[fx][fy] <= mcost) {
-      printf("POSSIBLE\n");
-    } else {
-      printf("IMPOSSIBLE\n");
-    }
+    vector<vector<int>> cost = bfs(sx, sy, g);
+    cout << (cost[fx][fy] <= c ? "POSSIBLE" : "IMPOSSIBLE") << '\n';
     for (int i = 0; i < n; i++) {
       for (int j = 0; j < m; j++) {
-        if (i == sx && j == sy || i == fx && j == fy) {
-          printf("%c", graph[i][j]);
-        } else if (cost[i][j] <= cost[fx][fy]) {
-          printf(".");
+        if ((i == sx && j == sy) || (i == fx && j == fy)) {
+          cout << g[i][j];
         } else {
-          printf("#");
+          cout << (cost[i][j] <= cost[fx][fy] ? "." : "#");  
         }
       }
-      printf("\n");
+      cout << '\n';
     }
-    printf("\n");
   }
   return 0;
 }

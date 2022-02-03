@@ -2,72 +2,68 @@
 
 using namespace std;
 
-const int N = 1010;
-
-int n;
-long long f[6][N];
-
-struct GIFT {
+struct Gift {
   long long w, h, d;
-} gift[6][N];
+};
 
-void solve(int i) {
+vector<long long> solve(vector<Gift>& cur_gift, vector<Gift>& prev_gift, vector<long long> prev_ans) {
+  vector<long long> ans(6);
   for (int now = 0; now < 6; now++) {
     long long cur_max = 0;
-    GIFT cur = gift[now][i];
+    Gift cur = cur_gift[now];
     for (int other = 0; other < 6; other++) {
       long long dh = 0, dd = 0;
-      GIFT prev = gift[other][i - 1];
+      Gift prev = prev_gift[other];
       if (cur.h > prev.h) {
         dh = (cur.h - prev.h) * cur.d;
         if (cur.d <= prev.d) {
-          dh *= 2;
+          dh <<= 1;
         }
       }
       if (cur.d > prev.d) {
         dd = (cur.d - prev.d) * cur.h;
         if (cur.h <= prev.h) {
-          dd *= 2;
+          dd <<= 1;
         }
       }
       if (cur.h > prev.h && cur.d > prev.d) {
         dh -= (cur.d - prev.d) * (cur.h - prev.h);
-        dh *= 2;
-        dd *= 2;
+        dh <<= 1;
+        dd <<= 1;
       }
-      cur_max = max(cur_max, cur.w * cur.d * 2 + cur.w * cur.h + f[other][i - 1] + dd + dh);
+      cur_max = max(cur_max, cur.w * cur.d * 2 + cur.w * cur.h + prev_ans[other] + dd + dh);
     }
-    f[now][i] = cur_max;
+    ans[now] = cur_max;
   }
+  return ans;
 }
 
 int main() {
   int tt;
-  scanf("%d", &tt);
+  cin >> tt;
   while (tt--) {
-    scanf("%d", &n);
+    int n;
+    cin >> n;
+    vector<vector<Gift>> gifts(n, vector<Gift>(6));
     for (int i = 0; i < n; i++) {
       long long w, h, d;
-      scanf("%lld %lld %lld", &w, &h, &d);
-      gift[0][i] = GIFT {w, h, d};
-      gift[1][i] = GIFT {w, d, h};
-      gift[2][i] = GIFT {d, h, w};
-      gift[3][i] = GIFT {d, w, h};
-      gift[4][i] = GIFT {h, d, w};
-      gift[5][i] = GIFT {h, w, d};
+      cin >> w >> h >> d;
+      gifts[i][0] = Gift {w, h, d};
+      gifts[i][1] = Gift {w, d, h};
+      gifts[i][2] = Gift {d, h, w};
+      gifts[i][3] = Gift {d, w, h};
+      gifts[i][4] = Gift {h, d, w};
+      gifts[i][5] = Gift {h, w, d};
     }
+    vector<long long> f(6);
     for (int i = 0; i < 6; i++) {
-      GIFT cur = gift[i][0];
-      f[i][0] = cur.w * cur.d * 2 + cur.h * cur.d * 2 + cur.w * cur.h;
+      Gift cur = gifts[0][i];
+      f[i] = cur.w * cur.d * 2 + cur.h * cur.d * 2 + cur.w * cur.h;
     }
     for (int i = 1; i < n; i++) {
-      solve(i);
+      f = solve(gifts[i], gifts[i - 1], f);
     }
-    long long ans = 0;
-    for (int i = 0; i < 6; i++) {
-      ans = max(ans, f[i][n - 1]);
-    }
-    printf("%lld\n", ans);
+    cout << *max_element(f.begin(), f.end()) << '\n';
   }
   return 0;
 }
